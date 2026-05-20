@@ -1,5 +1,7 @@
 from flask import Flask
 from markupsafe import escape
+from flask import url_for
+from flask import render_template
 
 app = Flask(__name__)
 
@@ -11,9 +13,9 @@ def hello_world():
     return "<p> Hello world!</p>" + display
 
 @app.route("/home")
-def home():
-    message = "<p> This is the home page ;) </p>"
-    return message
+@app.route("/home/<name>")
+def home(name=None):
+    return render_template("home.html", person=name)
 
 @app.route("/variable/<username>")
 def username(username):
@@ -22,3 +24,8 @@ def username(username):
 @app.route("/about/")
 def about():
     return "about page"
+
+with app.test_request_context():
+    print(url_for('home'))
+    print(url_for('about'))
+    print(url_for('username', username='Carl'))
