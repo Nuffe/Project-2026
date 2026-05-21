@@ -8,10 +8,10 @@
     <p>Add guests <input type = "text" name ="name" /> </p>
 </form>
 
-<p> Guests present:</p>
+<span> Guests present:</span>
 {% if guests %}
 {% for guest in guests %}
- <div><p> {{ guest }} </p></div>
+<span> {{ guest }} </span>
 {% endfor %}
 {% endif %}
 <form action="/clearGuestList" method="POST"> 
