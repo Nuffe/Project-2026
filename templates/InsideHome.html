@@ -1,0 +1,21 @@
+{% extends "home.html" %}
+
+{% block body %}
+
+<h1> You are now inside </h1>
+<p>  Look the TV is on 📺</p>
+<form action="/home/inside" method ="POST">
+    <p>Add guests <input type = "text" name ="name" /> </p>
+</form>
+
+<p> Guests present:</p>
+{% if guests %}
+{% for guest in guests %}
+ <div><p> {{ guest }} </p></div>
+{% endfor %}
+{% endif %}
+<form action="/clearGuestList" method="POST"> 
+    <button name="clear"> Clear guest list</button>
+</form>
+
+{% endblock %}
