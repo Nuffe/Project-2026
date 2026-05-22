@@ -18,4 +18,16 @@
     <button name="clear"> Clear guest list</button>
 </form>
 
+<form action="/upload" method="post"  enctype=multipart/form-data>
+    <input type="file" name="file" />
+    <button type="submit">Add image</button>
+</form>
+
+{% if image %}
+     <img src="/static/uploads/{{image}}" style="width:400px;height:400px;" />
+{% endif %}
+{% if error %}
+    alert({{error}})
+{% endif %}
+
 {% endblock %}
