@@ -3,6 +3,7 @@ from markupsafe import escape
 from flask import render_template
 from flask import Flask, flash, request, redirect, url_for
 from flask import request
+from flask import g
 from werkzeug.utils import secure_filename
 import os
 
@@ -24,22 +25,13 @@ def home(name=None):
     return render_template("home.html", person=name)
 
 @app.route("/home/inside", methods=["POST", "GET"])
-def inside(guest = None):
+def inside():
     if request.method == "POST":
-
         guest_list.append(request.form["name"])
         print("PEOPLE: ", guest_list)
         return render_template("insideHome.html", guests = guest_list)
 
     return render_template("InsideHome.html", guests = guest_list)
-
-@app.route("/variable/<username>")
-def username(username):
-    return f"User {escape(username)}"
-
-@app.route("/about/")
-def about():
-    return "about page"
 
 @app.route("/clearGuestList", methods=["POST"])
 def clear():
@@ -56,3 +48,24 @@ def upload():
         return render_template("InsideHome.html", guest=guest_list, image=file.filename)
     else:
          return render_template("InsideHome.html", guest=guest_list, error="noImage")
+    
+@app.route("/variable/<username>")
+def username(username):
+    return f"User {escape(username)}"
+
+@app.route("/about/")
+def about():
+    return "about page"
+
+
+@app.shell_context_processor
+def make_shell_context():
+    from db import get_db, query_db
+    conn = get_db()
+    return dict(conn=conn, cur=conn.cursor(), query_db=query_db)
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
