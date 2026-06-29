@@ -4,7 +4,3 @@ When i find the time and energy
 Gonna try and only use Their documentation and stay of tutorials and AI, Probably gonna result in it being very jank ;)
 
 
-Journey:
-
-Day 1, Start going through https://flask.palletsprojects.com/en/stable/quickstart/  
-and trying out flask, seeing how it work.
