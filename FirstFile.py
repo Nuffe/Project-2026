@@ -7,12 +7,22 @@ from flask import g
 from werkzeug.utils import secure_filename
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
-from db import get_users, delete_user, add_user
+from db import get_users, delete_user, add_user, query_db
+from dotenv import load_dotenv
+from flask_login import LoginManager, login_user, current_user, logout_user, login_required
+from user import User
+
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = "static/uploads"
+
+load_dotenv()
+app.secret_key = os.getenv("SECRET_KEY")
+login_manager = LoginManager()
+login_manager.init_app(app)
+
 
 guest_list = []
 
@@ -66,12 +76,10 @@ def deleteUser():
 
 @app.route("/addUser", methods=["POST"])
 def addUser():
-    add_user(request.form["username"],request.form["age"],request.form["password"])
+    if request.form["username"] and request.form["password"]:
+        password = generate_password_hash(request.form["password"])
+        add_user(request.form["username"],request.form["age"], password)
     return redirect(url_for("inside"))
-
-
-
-
 
 
 @app.route("/variable/<username>")
@@ -82,6 +90,39 @@ def username(username):
 def about():
     return "about page"
 
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+    if current_user.is_authenticated:
+        return redirect(url_for("inside"))
+
+
+    if  request.method == "POST":
+        username= request.form["username"]
+        password = request.form["password"]
+
+        query = "SELECT * FROM users WHERE name = ?"
+        result = query_db(query, (username,), one=True)
+
+        passwordCheck = check_password_hash(result["password"], password)
+        if passwordCheck:
+            user = User(result["name"], result["ID"], result["age"], result["password"]  )
+            login = login_user(user)
+            if login:
+                print("login success")
+            else:
+                print("login fail")
+            return redirect(url_for("inside"))
+        print("Wong password")
+        return redirect(url_for("login"))   
+    return render_template("login.html")
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
 
 @app.shell_context_processor
 def make_shell_context():
@@ -94,3 +135,11 @@ def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
+
+@login_manager.user_loader
+def load_user(user_id):
+    result =  query_db("SELECT * FROM users WHERE ID = ?", (user_id,), one=True)
+    if result is None:
+        return None
+    user = User(result["name"], result["ID"], result["age"], result["password"])
+    return user

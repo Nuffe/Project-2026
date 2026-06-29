@@ -4,3 +4,4 @@ uploads/
 static/uploads/
 crate.db
 crate.db-journal
+.env
