@@ -17,3 +17,23 @@ def query_db(query, args=(), one=False):
     rv = cur.fetchall()
     cur.close()
     return (rv[0] if rv else None) if one else rv
+
+
+def change_db(query, args=()):
+    db = get_db()
+    db.execute(query, args)
+    db.commit()
+
+def get_users():
+    query = "SELECT * FROM users"
+    return query_db(query)
+
+
+def delete_user(name):
+    query = "DELETE FROM users WHERE name = (?)"
+    return change_db(query, (name,))
+
+def add_user(name, age, password):
+    query = "INSERT INTO users(name, age, password) VALUES (?, ?, ?)"
+    return change_db(query, (name, age, password))
+

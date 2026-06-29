@@ -6,6 +6,8 @@ from flask import request
 from flask import g
 from werkzeug.utils import secure_filename
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
+from db import get_users, delete_user, add_user
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
@@ -19,25 +21,31 @@ def hello_world():
     display = "<p> Is this message coming thought? </p>"
     return "<p> Hello world!</p>" + display
 
+
 @app.route("/home")
 @app.route("/home/<name>")
 def home(name=None):
     return render_template("home.html", person=name)
 
+
 @app.route("/home/inside", methods=["POST", "GET"])
 def inside():
+    users = get_users()
     if request.method == "POST":
         guest_list.append(request.form["name"])
         print("PEOPLE: ", guest_list)
-        return render_template("insideHome.html", guests = guest_list)
+        return render_template("insideHome.html", guests = guest_list, users = get_users())
 
-    return render_template("InsideHome.html", guests = guest_list)
+    return render_template("InsideHome.html", guests = guest_list, users = get_users())
+
 
 @app.route("/clearGuestList", methods=["POST"])
 def clear():
     guest_list.clear()
     return redirect(url_for("inside"))
 
+
+# Future idea, look into dynamic return template, so route can be used elsewhere
 @app.route("/upload", methods=["POST"])
 def upload():
     if 'file' not in request.files:
@@ -49,6 +57,23 @@ def upload():
     else:
          return render_template("InsideHome.html", guest=guest_list, error="noImage")
     
+
+@app.route("/deleteUser", methods=["POST"])
+def deleteUser():
+    delete_user(request.form["name"])
+    return redirect(url_for("inside"))
+
+
+@app.route("/addUser", methods=["POST"])
+def addUser():
+    add_user(request.form["username"],request.form["age"],request.form["password"])
+    return redirect(url_for("inside"))
+
+
+
+
+
+
 @app.route("/variable/<username>")
 def username(username):
     return f"User {escape(username)}"

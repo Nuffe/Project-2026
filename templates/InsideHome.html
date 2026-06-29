@@ -10,14 +10,16 @@
 
 <span> Guests present:</span>
 {% if guests %}
-{% for guest in guests %}
-<span> {{ guest }} </span>
-{% endfor %}
+    {% for guest in guests %}
+        <span> {{ guest }} </span>
+    {% endfor %}
 {% endif %}
 <form action="/clearGuestList" method="POST"> 
     <button name="clear"> Clear guest list</button>
 </form>
 
+
+<br><br>
 <form action="/upload" method="post"  enctype=multipart/form-data>
     <input type="file" name="file" />
     <button type="submit">Add image</button>
@@ -29,5 +31,38 @@
 {% if error %}
     alert(Error: {{error}})
 {% endif %}
+
+<br><br>
+
+    <button onclick="insertFields()"> add user</button>
+<br>
+    <div id="userInput">
+        <form action="/addUser" method="POST"> 
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username"><br><br>
+
+            <label for="age">Age:</label>
+            <input type="text" id="age" name="age"><br><br>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password"><br><br>
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+{% if users %}
+    <p> Existing users: </p>
+    {% for user in users %}
+        <div>
+            <form action="/deleteUser" method="POST"> 
+                <input type="hidden" name="name" value="{{ user.name }}">
+                <span> Name: {{ user.name}}  Age: {{user.age}}  Password: {{user.password}} </span>
+                <button name="delete_user"> Delete </button>
+            </form>
+        </div>
+    {% endfor %}
+{% endif %}
+
 
 {% endblock %}
