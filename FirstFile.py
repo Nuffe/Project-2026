@@ -7,7 +7,7 @@ from flask import g
 from werkzeug.utils import secure_filename
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
-from db import get_users, delete_user, add_user, query_db
+from db import get_users, delete_user, add_user, query_db, get_admins
 from dotenv import load_dotenv
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
 from user import User
@@ -21,25 +21,21 @@ app.config['UPLOAD_FOLDER'] = "static/uploads"
 
 load_dotenv()
 app.secret_key = os.getenv("SECRET_KEY")
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-
 guest_list = []
 
-
+# Add Error page or popup instead of comments
 def is_admin(f):
-    x = 1
     @wraps(f)
     def wrapFunction(*args, **kwargs):
         if current_user.is_anonymous:
             print("YOU ARE NOT LOGGED in")
             return redirect(url_for("home"))
         query = "SELECT role FROM users WHERE ID = ?"
-        print("CURRENT USER", current_user.id)
-        
         result = query_db(query, (current_user.id,), one=True)
-        print("YOUR ROLE IS:", result["role"])
         if result["role"] == "Admin":
             return f(*args, **kwargs)
         else:
@@ -62,9 +58,14 @@ def home(name=None):
     return render_template("home.html", person=name)
 
 
+@app.route("/register")
+@is_admin
+def register():
+    
+    return render_template("register.html", users=get_users(), admins=get_admins())
+
 @app.route("/home/inside", methods=["POST", "GET"])
 def inside():
-    users = get_users()
     if request.method == "POST":
         guest_list.append(request.form["name"])
         print("PEOPLE: ", guest_list)
@@ -95,15 +96,17 @@ def upload():
 @app.route("/deleteUser", methods=["POST"])
 def deleteUser():
     delete_user(request.form["name"])
-    return redirect(url_for("inside"))
+    return redirect(url_for("register"))
 
 
 @app.route("/addUser", methods=["POST"])
 def addUser():
+    print(request.form["role"])
     if request.form["username"] and request.form["password"]:
         password = generate_password_hash(request.form["password"])
-        add_user(request.form["username"],request.form["age"], password)
-    return redirect(url_for("inside"))
+        add_user(request.form["username"],request.form["age"], password, request.form["role"])
+    return redirect(url_for("register"))
+
 
 
 @app.route("/variable/<username>")
@@ -117,10 +120,8 @@ def about():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-
     if current_user.is_authenticated:
         return redirect(url_for("inside"))
-
 
     if  request.method == "POST":
         username= request.form["username"]
@@ -142,9 +143,11 @@ def login():
             else:
                 print("login fail")
             return redirect(url_for("inside"))
+        
         print("Wong password")
         return redirect(url_for("login"))   
     return render_template("login.html")
+
 
 @app.route("/logout")
 @login_required

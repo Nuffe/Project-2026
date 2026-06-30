@@ -25,7 +25,11 @@ def change_db(query, args=()):
     db.commit()
 
 def get_users():
-    query = "SELECT * FROM users"
+    query = "SELECT * FROM users WHERE role='User'"
+    return query_db(query)
+
+def get_admins():
+    query = "SELECT * FROM users WHERE role='Admin'"
     return query_db(query)
 
 
@@ -33,7 +37,7 @@ def delete_user(name):
     query = "DELETE FROM users WHERE name = (?)"
     return change_db(query, (name,))
 
-def add_user(name, age, password):
-    query = "INSERT INTO users(name, age, password) VALUES (?, ?, ?)"
-    return change_db(query, (name, age, password))
+def add_user(name, age, password, role):
+    query = "INSERT INTO users(name, age, password, role) VALUES (?, ?, ?, ?)"
+    return change_db(query, (name, age, password, role))
 
