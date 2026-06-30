@@ -11,6 +11,7 @@ from db import get_users, delete_user, add_user, query_db
 from dotenv import load_dotenv
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
 from user import User
+from functools import wraps
 
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -26,9 +27,32 @@ login_manager.init_app(app)
 
 guest_list = []
 
+
+def is_admin(f):
+    x = 1
+    @wraps(f)
+    def wrapFunction(*args, **kwargs):
+        if current_user.is_anonymous:
+            print("YOU ARE NOT LOGGED in")
+            return redirect(url_for("home"))
+        query = "SELECT role FROM users WHERE ID = ?"
+        print("CURRENT USER", current_user.id)
+        
+        result = query_db(query, (current_user.id,), one=True)
+        print("YOUR ROLE IS:", result["role"])
+        if result["role"] == "Admin":
+            return f(*args, **kwargs)
+        else:
+            print("You are not admin")
+            return redirect(url_for("home"))
+    return wrapFunction
+
+
 @app.route("/hello")
+@is_admin
 def hello_world():
     display = "<p> Is this message coming thought? </p>"
+    print("hello WORLD")
     return "<p> Hello world!</p>" + display
 
 
@@ -105,7 +129,11 @@ def login():
         query = "SELECT * FROM users WHERE name = ?"
         result = query_db(query, (username,), one=True)
 
-        passwordCheck = check_password_hash(result["password"], password)
+        if result:
+            passwordCheck = check_password_hash(result["password"], password)
+        else:
+            passwordCheck = None
+
         if passwordCheck:
             user = User(result["name"], result["ID"], result["age"], result["password"]  )
             login = login_user(user)
@@ -121,14 +149,16 @@ def login():
 @app.route("/logout")
 @login_required
 def logout():
+    print(current_user.name)
+    print(current_user.get_id())
     logout_user()
     return redirect(url_for("login"))
 
 @app.shell_context_processor
 def make_shell_context():
-    from db import get_db, query_db
+    from db import get_db, query_db, change_db
     conn = get_db()
-    return dict(conn=conn, cur=conn.cursor(), query_db=query_db)
+    return dict(conn=conn, cur=conn.cursor(), query_db=query_db, change_db=change_db)
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -138,8 +168,11 @@ def close_connection(exception):
 
 @login_manager.user_loader
 def load_user(user_id):
+    print("LOAD_USER WAS RUN")
     result =  query_db("SELECT * FROM users WHERE ID = ?", (user_id,), one=True)
     if result is None:
         return None
     user = User(result["name"], result["ID"], result["age"], result["password"])
     return user
+
+
