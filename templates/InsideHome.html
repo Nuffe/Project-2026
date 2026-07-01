@@ -32,37 +32,6 @@
     alert(Error: {{error}})
 {% endif %}
 
-<br><br>
-
-    <button onclick="insertFields()"> add user</button>
-<br>
-    <div id="userInput">
-        <form action="/addUser" method="POST"> 
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" minlength="3"><br><br>
-
-            <label for="age">Age:</label>
-            <input type="text" id="age" name="age"><br><br>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" minlength="4"><br><br>
-
-            <input type="submit" value="Submit">
-        </form>
-    </div>
-
-{% if users %}
-    <p> Existing users: </p>
-    {% for user in users %}
-        <div>
-            <form action="/deleteUser" method="POST"> 
-                <input type="hidden" name="name" value="{{ user.name }}">
-                <span> Name: {{ user.name}}  Age: {{user.age}}  Password: {{user.password}} </span>
-                <button name="delete_user"> Delete </button>
-            </form>
-        </div>
-    {% endfor %}
-{% endif %}
 
 
 {% endblock %}

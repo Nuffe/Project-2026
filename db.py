@@ -24,6 +24,10 @@ def change_db(query, args=()):
     db.execute(query, args)
     db.commit()
 
+def get_all_users():
+    query = "SELECT * FROM users"
+    return query_db(query)
+
 def get_users():
     query = "SELECT * FROM users WHERE role='User'"
     return query_db(query)
@@ -32,6 +36,9 @@ def get_admins():
     query = "SELECT * FROM users WHERE role='Admin'"
     return query_db(query)
 
+def get_role(id):
+    query = "SELECT role FROM users WHERE ID = ?"
+    return query_db(query, (id,))
 
 def delete_user(name):
     query = "DELETE FROM users WHERE name = (?)"

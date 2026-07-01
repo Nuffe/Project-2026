@@ -7,11 +7,13 @@ from flask import g
 from werkzeug.utils import secure_filename
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
-from db import get_users, delete_user, add_user, query_db, get_admins
+from db import get_users, delete_user, add_user, query_db, get_admins, get_all_users
 from dotenv import load_dotenv
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
 from user import User
 from functools import wraps
+import requests
+import json
 
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -44,6 +46,31 @@ def is_admin(f):
     return wrapFunction
 
 
+@app.route("/requestUsers")
+def users():
+    users = get_all_users()
+    jsonUsers = []
+    for user in users:
+        jsonUser = {
+            "name": user["name"],
+            "age": user["age"],
+            "role": user["role"],
+            "id": user["ID"]
+        }
+        jsonUsers.append(jsonUser)
+    return jsonUsers
+
+
+@app.route("/users", methods=["GET"])
+def requesting():
+    print("hello request")
+    if request.method == "GET":
+        response = requests.get("http://127.0.0.1:5000/requestUsers")
+        loadedResponse = response.json()
+        return render_template("users.html", users=loadedResponse )
+
+        
+
 @app.route("/hello")
 @is_admin
 def hello_world():
@@ -61,7 +88,6 @@ def home(name=None):
 @app.route("/register")
 @is_admin
 def register():
-    
     return render_template("register.html", users=get_users(), admins=get_admins())
 
 @app.route("/home/inside", methods=["POST", "GET"])
@@ -94,12 +120,14 @@ def upload():
     
 
 @app.route("/deleteUser", methods=["POST"])
+@is_admin
 def deleteUser():
     delete_user(request.form["name"])
     return redirect(url_for("register"))
 
 
 @app.route("/addUser", methods=["POST"])
+@is_admin
 def addUser():
     print(request.form["role"])
     if request.form["username"] and request.form["password"]:
@@ -136,7 +164,7 @@ def login():
             passwordCheck = None
 
         if passwordCheck:
-            user = User(result["name"], result["ID"], result["age"], result["password"]  )
+            user = User(result["name"], result["ID"], result["age"], result["password"], result["role"]  )
             login = login_user(user)
             if login:
                 print("login success")
@@ -175,7 +203,9 @@ def load_user(user_id):
     result =  query_db("SELECT * FROM users WHERE ID = ?", (user_id,), one=True)
     if result is None:
         return None
-    user = User(result["name"], result["ID"], result["age"], result["password"])
+    user = User(result["name"], result["ID"], result["age"], result["password"], result["role"])
     return user
+
+
 
 
