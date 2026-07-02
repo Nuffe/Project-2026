@@ -39,6 +39,7 @@ def is_admin(f):
         query = "SELECT role FROM users WHERE ID = ?"
         result = query_db(query, (current_user.id,), one=True)
         if result["role"] == "Admin":
+            print("you are admin, go ahead")
             return f(*args, **kwargs)
         else:
             print("You are not admin")
@@ -48,29 +49,35 @@ def is_admin(f):
 
 @app.route("/requestUsers")
 def users():
-    users = get_all_users()
-    jsonUsers = []
-    for user in users:
-        jsonUser = {
-            "name": user["name"],
-            "age": user["age"],
-            "role": user["role"],
-            "id": user["ID"]
-        }
-        jsonUsers.append(jsonUser)
-    return jsonUsers
+    if request.headers["Key"] == "Admin":
+        users = get_all_users()
+        jsonUsers = []
+        print(request.headers)
+        for user in users:
+            jsonUser = {
+                "name": user["name"],
+                "age": user["age"],
+                "role": user["role"],
+                "id": user["ID"]
+            }
+            jsonUsers.append(jsonUser)
+        return jsonUsers
+    return {"error": "Missing permissions"} #Make this page or flask
 
 
 @app.route("/users", methods=["GET"])
+@is_admin
 def requesting():
-    print("hello request")
     if request.method == "GET":
-        response = requests.get("http://127.0.0.1:5000/requestUsers")
-        loadedResponse = response.json()
-        return render_template("users.html", users=loadedResponse )
+        header = {"Key": "Admin"} #Place holder, make DB keys?
+        response = requests.get("http://127.0.0.1:5000/requestUsers", headers=header )
+        if response:
+            loadedResponse = response.json()
+            return render_template("users.html", users=loadedResponse )
+        else:
+            print("RESPONSE FAILED")
 
         
-
 @app.route("/hello")
 @is_admin
 def hello_world():
