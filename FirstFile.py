@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from db import get_users, delete_user, add_user, query_db, get_admins, get_all_users
 from dotenv import load_dotenv
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
-from user import User
+from app.user import User
 from functools import wraps
 import requests
 import json
@@ -81,20 +81,6 @@ def requesting():
             print("RESPONSE FAILED")
 
         
-@app.route("/hello")
-@is_admin
-def hello_world():
-    display = "<p> Is this message coming thought? </p>"
-    print("hello WORLD")
-    return "<p> Hello world!</p>" + display
-
-
-@app.route("/home")
-@app.route("/home/<name>")
-def home(name=None):
-    return render_template("home.html", person=name)
-
-
 @app.route("/register")
 @is_admin
 def register():
@@ -206,14 +192,6 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
-@login_manager.user_loader
-def load_user(user_id):
-    print("LOAD_USER WAS RUN")
-    result =  query_db("SELECT * FROM users WHERE ID = ?", (user_id,), one=True)
-    if result is None:
-        return None
-    user = User(result["name"], result["ID"], result["age"], result["password"], result["role"])
-    return user
 
 
 
