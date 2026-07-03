@@ -5,6 +5,7 @@
 <h1> You are now inside </h1>
 <p>  Look the TV is on 📺</p>
 <form action="/home/inside" method ="POST">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <p>Add guests <input type = "text" name ="name" /> </p>
 </form>
 
@@ -15,12 +16,14 @@
     {% endfor %}
 {% endif %}
 <form action="/clearGuestList" method="POST"> 
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <button name="clear"> Clear guest list</button>
 </form>
 
 
 <br><br>
 <form action="/upload" method="post"  enctype=multipart/form-data>
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <input type="file" name="file" />
     <button type="submit">Add image</button>
 </form>

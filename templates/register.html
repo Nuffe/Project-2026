@@ -4,7 +4,8 @@
 
 <br>
     <div id="userInput">
-        <form action="/addUser" method="POST"> 
+        <form action="/addUser" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" minlength="3"><br><br>
 
@@ -29,6 +30,7 @@
     {% for user in users %}
         <div>
             <form action="/deleteUser" method="POST"> 
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input type="hidden" name="name" value="{{ user.name }}">
                 <span> Name: {{ user.name}}  Age: {{user.age}}  </span>
                 <button name="delete_user"> Delete </button>
@@ -43,6 +45,7 @@
     {% for admin in admins %}
         <div>
             <form action="/deleteUser" method="POST"> 
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input type="hidden" name="name" value="{{ admin.name }}">
                 <span> Name: {{ admin.name}}  Age: {{admin.age}}  </span>
                 <button name="delete_user"> Delete </button>

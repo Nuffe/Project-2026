@@ -14,6 +14,7 @@ from user import User
 from functools import wraps
 import requests
 import json
+from flask_wtf.csrf import CSRFProtect
 
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -23,6 +24,8 @@ app.config['UPLOAD_FOLDER'] = "static/uploads"
 
 load_dotenv()
 app.secret_key = os.getenv("SECRET_KEY")
+
+csrf = CSRFProtect(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -136,7 +139,6 @@ def deleteUser():
 @app.route("/addUser", methods=["POST"])
 @is_admin
 def addUser():
-    print(request.form["role"])
     if request.form["username"] and request.form["password"]:
         password = generate_password_hash(request.form["password"])
         add_user(request.form["username"],request.form["age"], password, request.form["role"])
