@@ -1,7 +1,7 @@
 
 from flask import Blueprint
 from app.helpers import is_admin
-from flask import render_template
+from flask import render_template, flash
 from flask import request
 from db import get_users, get_all_users
 from flask import request, redirect, url_for
@@ -22,7 +22,7 @@ def register():
 
 
 @bp.route("/requestUsers")
-def users():
+def requesting():
     if request.headers["Key"] == "Admin":
         users = get_all_users()
         jsonUsers = []
@@ -40,7 +40,7 @@ def users():
 
 @bp.route("/users", methods=["GET"])
 @is_admin
-def requesting():
+def users():
     print("CURRENT USER ROLE", current_user.is_anonymous)
     if request.method == "GET":
         header = {"Key": "Admin"} #Place holder, make DB keys?
@@ -57,7 +57,7 @@ def requesting():
 @is_admin
 def deleteUser():
     delete_user(request.form["name"])
-    return redirect(url_for("admin.register"))
+    return redirect(url_for("admin.users"))
 
 @bp.route("/addUser", methods=["POST"])
 @is_admin
@@ -65,5 +65,8 @@ def addUser():
     if request.form["username"] and request.form["password"]:
         password = generate_password_hash(request.form["password"])
         add_user(request.form["username"], request.form["age"], password, request.form["role"])
+        flash(f"User {request.form['username']} was successfully added")
+    else:
+        flash("Was unable to add user")
     return redirect(url_for("admin.register"))
 

@@ -15,14 +15,15 @@
 <body>
     <header>
         <nav>   
-            <a href="/home/inside"> Inside </a> 
+            <a href="/misc/inside"> Inside </a> 
             <a href="/about"> About </a>
-            <a href="/home"> Home  </a> 
+            <a href="/misc/home"> Home  </a> 
             <a href="#"> Profile </a> 
             {% if current_user.is_authenticated %}
                 <a href="/auth/logout">Logout</a>
                 {% if current_user.role == "Admin" %}
-                <a href="/register">Register</a>
+                <a href="/admin/register">Register</a>
+                <a href="/admin/users">Users</a>
                 {% endif %}
             {% else %}
                 <a href="/auth/login">Login</a>

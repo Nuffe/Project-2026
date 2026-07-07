@@ -10,14 +10,22 @@
 </tr>
 {% if users %}
     {% for user in users %}
-    <tr>
-    <td>{{ user.id }}</td>
-    <td>{{ user.name }}</td>
-    <td>{{ user.age }}</td>
-    <td>{{ user.role }}</td>
-</tr>
+    <form action="/admin/deleteUser" method="POST"> 
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="hidden" name="name" value="{{ user.name }}">
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.age }}</td>
+                    <td>{{ user.role }}</td>
+                    <td> <button name="delete_user"> Delete </button> </td>
+                </tr>
+    </form>
     {% endfor %}
 </table>
 {% endif %}    
+
+
+
 
 {% endblock %}

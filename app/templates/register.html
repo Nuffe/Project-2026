@@ -7,17 +7,17 @@
         <form action="/admin/addUser" method="POST">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" minlength="3"><br><br>
+            <input type="text" id="username" name="username" minlength="3" required ><br><br>
 
             <label for="age">Age:</label>
-            <input type="text" id="age" name="age"><br><br>
+            <input type="text" id="age" name="age" required><br><br>
 
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" minlength="4"><br><br>
+            <input type="password" id="password" name="password" minlength="4" required><br><br>
 
 
-            <label for="role">User</label>
-            <input type="radio" id="user" name="role" value="User">
+            <label for="role" >User</label>
+            <input type="radio" id="user" name="role" value="User" checked>
             <label for="role">Admin</label>
             <input type="radio" id="admin" name="role" value="Admin">
             <br><br>
@@ -25,32 +25,15 @@
         </form>
     </div>
 
-<p> Users:</p>
-{% if users %}
-    {% for user in users %}
-        <div>
-            <form action="/admin/deleteUser" method="POST"> 
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <input type="hidden" name="name" value="{{ user.name }}">
-                <span> Name: {{ user.name}}  Age: {{user.age}}  </span>
-                <button name="delete_user"> Delete </button>
-            </form>
-        </div>
-    {% endfor %}
-{% endif %}
 
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class=flashes>
+        {% for message in messages%}
+          <p> {{ message }}</p>
+        {% endfor%}
+    </div>
+    {% endif %}
+{% endwith %}
 
-<p>Admins</p>
-{% if admins %}
-    {% for admin in admins %}
-        <div>
-            <form action="/admin/deleteUser" method="POST"> 
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <input type="hidden" name="name" value="{{ admin.name }}">
-                <span> Name: {{ admin.name}}  Age: {{admin.age}}  </span>
-                <button name="delete_user"> Delete </button>
-            </form>
-        </div>
-    {% endfor %}
-{% endif %}
 {% endblock %}
