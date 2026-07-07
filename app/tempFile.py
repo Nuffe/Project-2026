@@ -3,7 +3,6 @@ from app.user import User
 from db import query_db
 
 
-
 @login_manager.user_loader
 def load_user(user_id):
     print("LOAD_USER WAS RUN")

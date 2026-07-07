@@ -1,12 +1,11 @@
 
 from flask import Blueprint
-from app.helpers import is_admin
 from flask import render_template
 from flask import request
-from flask_login import LoginManager, login_user, current_user, logout_user, login_required
+from flask_login import login_user, current_user, logout_user, login_required
 from app.user import User
-from flask import Flask, flash, request, redirect, url_for
-from db import query_db, get_admins, get_users
+from flask import request, redirect, url_for
+from db import query_db
 from werkzeug.security import check_password_hash
 
 bp = Blueprint('auth', __name__, url_prefix="/auth")
@@ -50,12 +49,6 @@ def logout():
     print(current_user.get_id())
     logout_user()
     return redirect(url_for("auth.login"))
-
-@bp.route("/register")
-@is_admin
-def register():
-    return render_template("register.html", users=get_users(), admins=get_admins())
-
 
 
 

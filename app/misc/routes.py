@@ -1,10 +1,10 @@
 
 from flask import Blueprint
-from app.helpers import is_admin
 from flask import render_template
-from flask import request
-from db import get_users, get_all_users
-import requests
+from db import get_users
+from flask import  request
+from db import get_users
+
 from flask_login import current_user
 
 
@@ -31,32 +31,17 @@ def inside():
     return render_template("InsideHome.html", users = get_users())
 
 
-@bp.route("/requestUsers")
-def users():
-    if request.headers["Key"] == "Admin":
-        users = get_all_users()
-        jsonUsers = []
-        for user in users:
-            jsonUser = {
-                "name": user["name"],
-                "age": user["age"],
-                "role": user["role"],
-                "id": user["ID"]
-            }
-            jsonUsers.append(jsonUser)
-        return jsonUsers
-    return {"error": "Missing permissions"} #Make this page or flask
 
-
-@bp.route("/users", methods=["GET"])
-@is_admin
-def requesting():
-    print("CURRENT USER ROLE", current_user.is_anonymous)
-    if request.method == "GET":
-        header = {"Key": "Admin"} #Place holder, make DB keys?
-        response = requests.get("http://127.0.0.1:5000/requestUsers", headers=header )
-        if response:
-            loadedResponse = response.json()
-            return render_template("users.html", users=loadedResponse )
-        else:
-            print("RESPONSE FAILED")
+# Future idea, look into dynamic return template, so route can be used elsewhere
+''' REDO, TO WORK WITH BLUEPRINTS
+@bp.route("/upload", methods=["POST"])
+def upload():
+    if 'file' not in request.files:
+        return render_template("InsideHome.html", guest=guest_list, error="badFile")
+    file = request.files['file']
+    if file.filename.endswith((".jpg", ".png", ".gif")):
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+        return render_template("InsideHome.html", guest=guest_list, image=file.filename)
+    else:
+         return render_template("InsideHome.html", guest=guest_list, error="noImage")
+'''

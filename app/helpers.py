@@ -2,10 +2,10 @@ from flask import redirect, url_for
 from db import  query_db
 from flask_login import current_user
 from functools import wraps
-from app.user import User
 
 
 
+# Add Error page or popup instead of comments
 def is_admin(f):
     @wraps(f)
     def wrapFunction(*args, **kwargs):
