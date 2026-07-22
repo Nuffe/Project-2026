@@ -1,0 +1,39 @@
+{% extends "home.html" %}
+
+{% block body %}
+
+<br>
+    <div id="userInput">
+        <form action="/admin/addUser" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" minlength="3" required ><br><br>
+
+            <label for="age">Age:</label>
+            <input type="text" id="age" name="age" required><br><br>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" minlength="4" required><br><br>
+
+
+            <label for="role" >User</label>
+            <input type="radio" id="user" name="role" value="User" checked>
+            <label for="role">Admin</label>
+            <input type="radio" id="admin" name="role" value="Admin">
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class=flashes>
+        {% for message in messages%}
+          <p> {{ message }}</p>
+        {% endfor%}
+    </div>
+    {% endif %}
+{% endwith %}
+
+{% endblock %}

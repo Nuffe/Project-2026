@@ -11,6 +11,10 @@ def get_db():
         db.row_factory = sqlite3.Row
     return db
 
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 def query_db(query, args=(), one=False):
     cur = get_db().execute(query, args)

@@ -1,6 +1,6 @@
 {% extends "home.html" %}
 {% block body %}
-<form action="/login" method="POST">
+<form action="/auth/login" method="POST">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
     <label for="username"> Username </label>

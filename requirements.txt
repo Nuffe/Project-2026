@@ -1,0 +1,7 @@
+Flask
+Flask_Login
+flask_wtf
+python-dotenv
+Requests
+Werkzeug
+gunicorn
