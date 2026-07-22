@@ -15,9 +15,9 @@
 <body>
     <header>
         <nav>   
-            <a href="/misc/inside"> Inside </a> 
+            <a href="/inside"> Inside </a> 
             <a href="/about"> About </a>
-            <a href="/misc/home"> Home  </a> 
+            <a href="/home"> Home  </a> 
             <a href="#"> Profile </a> 
             {% if current_user.is_authenticated %}
                 <a href="/auth/logout">Logout</a>
@@ -28,6 +28,7 @@
             {% else %}
                 <a href="/auth/login">Login</a>
             {% endif %}
+            <a href="/milkbox/">Milkbox</a>
         </nav>
     </header>
 

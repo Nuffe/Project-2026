@@ -1,0 +1,19 @@
+services:
+  web: 
+    build: .
+    ports:
+      - '8000:8000'
+    expose:
+      - "8000"
+
+  nginx-proxy:
+    image: nginx:1.19.7-alpine
+    volumes: #having a nginx folder and no folder for the app might clash?
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - /Users/c/Desktop/Work/milkbox/Textbox/web-editor/:/external
+    environment: 
+      - FLASK_SERVER_ADDR=web:8000
+    ports:
+      - "80:80"
+    depends_on:
+      - web

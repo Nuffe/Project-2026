@@ -5,3 +5,4 @@ static/uploads/
 crate.db
 crate.db-journal
 .env
+.venv

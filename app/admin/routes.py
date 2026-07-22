@@ -44,7 +44,8 @@ def users():
     print("CURRENT USER ROLE", current_user.is_anonymous)
     if request.method == "GET":
         header = {"Key": "Admin"} #Place holder, make DB keys?
-        response = requests.get("http://127.0.0.1:5000/admin/requestUsers", headers=header )
+         # Hardcoded locaiton, need to change later
+        response = requests.get("http://127.0.0.1:8000/admin/requestUsers", headers=header )
         if response:
             loadedResponse = response.json()
             return render_template("users.html", users=loadedResponse )
